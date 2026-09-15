@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#120d08">
 <title>Mohamed & Habiba · 19.09.2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Caveat:wght@400;500;600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<!-- canvas-confetti, used for the RSVP celebration burst -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -783,9 +785,612 @@
   }
 
   .hero, .save-date, .venue, .countdown-section, .program,
-  .gallery, .invite-section, footer {
+  .gallery, .invite-section, .wishwall-section, .memories-section, .live-gallery-section, .share-section, footer {
     position: relative;
     z-index: 1;
+  }
+
+  /* ─── WISHING WALL ─── */
+  .wishwall-section {
+    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    text-align: center;
+    padding: 90px 24px 70px;
+  }
+
+  .wishwall-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(32px, 8vw, 48px);
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .wishwall-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--muted);
+    margin: 0 auto 36px;
+    max-width: 340px;
+  }
+
+  .wish-form {
+    max-width: 380px;
+    margin: 0 auto 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .wish-input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(166,124,32,0.3);
+    background: rgba(255,255,255,0.6);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .wish-input::placeholder { color: rgba(155,122,67,0.6); }
+  .wish-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
+  .wish-textarea { min-height: 90px; resize: vertical; font-family: 'Cormorant Garamond', serif; }
+
+  .wish-submit {
+    margin-top: 4px;
+    padding: 15px 28px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #8f681d, #d4af37 48%, #8f681d);
+    color: #fffdf5;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+  }
+
+  .wish-submit:active { transform: scale(0.96); }
+  .wish-submit:disabled { opacity: 0.6; cursor: default; }
+
+  .wish-status {
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+    color: var(--gold-deep);
+    min-height: 24px;
+    margin-top: 4px;
+  }
+
+  .wish-wall {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .wish-empty {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: var(--muted);
+    opacity: 0.8;
+  }
+
+  .wish-card {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 18px;
+    padding: 18px 22px;
+    text-align: left;
+    box-shadow: 0 10px 22px -14px rgba(80,55,10,0.25);
+    animation: wishIn 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  @keyframes wishIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wish-card .wish-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--antique-gold);
+    margin-bottom: 6px;
+  }
+
+  .wish-card .wish-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .wish-card .wish-pinned {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--gold-deep);
+    margin-bottom: 6px;
+  }
+
+  /* ─── SHARE THE JOY ─── */
+  .share-section {
+    background: radial-gradient(circle at 50% 0%, #3b2a13 0%, #171006 42%, #090704 100%);
+    color: #fffdf5;
+    text-align: center;
+    padding: 90px 24px 100px;
+  }
+
+  .share-section .section-label { color: rgba(212,175,55,0.75); }
+
+  .share-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(30px, 8vw, 46px);
+    margin-bottom: 12px;
+  }
+
+  .share-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(255,226,151,0.68);
+    margin-bottom: 36px;
+  }
+
+  .share-preview {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto 30px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 18px 35px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,175,55,0.35);
+  }
+
+  .share-preview canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .share-btn {
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #8f681d, #d4af37 48%, #8f681d);
+    color: #fffdf5;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+  }
+
+  .share-btn:active { transform: scale(0.96); }
+
+  /* ─── RSVP CELEBRATION MODAL ─── */
+  .rsvp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,7,4,0.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .rsvp-modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .rsvp-modal {
+    position: relative;
+    max-width: 360px;
+    width: 100%;
+    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    border: 1px solid rgba(212,175,55,0.4);
+    border-radius: 24px;
+    padding: 44px 30px 36px;
+    text-align: center;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,175,55,0.15);
+    transform: translateY(24px) scale(0.96);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(.2,.8,.2,1), opacity 0.45s ease;
+  }
+
+  .rsvp-modal-overlay.show .rsvp-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .rsvp-modal-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+
+  .rsvp-modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .rsvp-modal p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--muted);
+  }
+
+  .rsvp-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(166,124,32,0.3);
+    background: rgba(255,255,255,0.6);
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .rsvp-modal-close:active { transform: scale(0.9); }
+
+  @media (max-width: 380px) {
+    .rsvp-modal { padding: 36px 22px 28px; }
+    .rsvp-modal h3 { font-size: 21px; }
+  }
+
+  /* ─── GUEST MEMORIES / PHOTO UPLOAD ─── */
+  .memories-section {
+    background: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    text-align: center;
+    padding: 90px 24px 80px;
+  }
+
+  .memories-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(32px, 8vw, 48px);
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .memories-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--muted);
+    margin: 0 auto 36px;
+    max-width: 340px;
+  }
+
+  .memories-dropzone {
+    max-width: 420px;
+    margin: 0 auto 24px;
+    border: 2px dashed rgba(166,124,32,0.4);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.4);
+    padding: 40px 24px;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.2s;
+  }
+
+  .memories-dropzone:hover,
+  .memories-dropzone:focus-visible {
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.6);
+    outline: none;
+  }
+
+  .memories-dropzone.dragover {
+    border-color: var(--gold);
+    background: rgba(212,175,55,0.12);
+    transform: scale(1.01);
+  }
+
+  .memories-dropzone-icon { font-size: 34px; margin-bottom: 10px; }
+
+  .memories-dropzone-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .memories-dropzone-or {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .memories-browse-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 50px;
+    border: 1px solid rgba(212,175,55,0.5);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--antique-gold);
+    background: rgba(255,255,255,0.5);
+    transition: background 0.2s;
+  }
+
+  .memories-dropzone:hover .memories-browse-btn { background: rgba(212,175,55,0.12); }
+
+  .memories-preview-grid {
+    max-width: 420px;
+    margin: 0 auto 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .memories-preview-item {
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ead7a5;
+    box-shadow: 0 6px 14px -8px rgba(80,55,10,0.3);
+    animation: wishIn 0.4s ease forwards;
+  }
+
+  .memories-preview-item img,
+  .memories-preview-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .memories-preview-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(9,7,4,0.6);
+    color: #fffdf5;
+    border: none;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .memories-submit {
+    padding: 15px 32px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #8f681d, #d4af37 48%, #8f681d);
+    color: #fffdf5;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .memories-submit:active { transform: scale(0.96); }
+  .memories-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .memories-status {
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+    color: var(--gold-deep);
+    min-height: 24px;
+    margin-top: 12px;
+  }
+
+  .memories-closed {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--gold-deep);
+    margin-top: 8px;
+    padding: 18px 20px;
+    border: 1px solid rgba(212,175,55,0.35);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.4);
+  }
+
+  /* ─── LIVE GALLERY (guest uploads shown on the site) ─── */
+  .live-gallery-section {
+    background: radial-gradient(circle at 50% 0%, #3b2a13 0%, #171006 42%, #090704 100%);
+    padding: 80px 0 90px;
+    color: #fffdf5;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .live-gallery-section .section-label { color: rgba(212,175,55,0.75); padding: 0 24px; }
+
+  .live-gallery-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(30px, 8vw, 46px);
+    margin-bottom: 8px;
+    padding: 0 24px;
+  }
+
+  .live-gallery-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: rgba(255,226,151,0.62);
+    margin-bottom: 10px;
+    padding: 0 24px;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,226,151,0.8);
+    margin-bottom: 30px;
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e0523c;
+    animation: liveDotPulse 1.6s infinite;
+  }
+
+  @keyframes liveDotPulse {
+    0% { box-shadow: 0 0 0 0 rgba(224,82,60,0.55); }
+    70% { box-shadow: 0 0 0 8px rgba(224,82,60,0); }
+    100% { box-shadow: 0 0 0 0 rgba(224,82,60,0); }
+  }
+
+  .live-gallery-strip {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding: 4px 24px 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .live-gallery-strip::-webkit-scrollbar { height: 4px; }
+  .live-gallery-strip::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.35); border-radius: 4px; }
+
+  .live-gallery-item {
+    flex: 0 0 auto;
+    width: 46vw;
+    max-width: 190px;
+    aspect-ratio: 3/4;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #21170a;
+    scroll-snap-align: start;
+    box-shadow: 0 14px 26px -14px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,175,55,0.3);
+    animation: liveItemIn 0.5s ease forwards;
+    opacity: 0;
+    transform: scale(0.92);
+    position: relative;
+  }
+
+  @keyframes liveItemIn {
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .live-gallery-item img,
+  .live-gallery-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .live-gallery-item img { cursor: pointer; }
+
+  .live-gallery-expand-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.55);
+    color: #fffdf5;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  /* ─── LIGHTBOX (tap a photo/video to enlarge) ─── */
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,7,4,0.94);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 24px;
+  }
+
+  .lightbox-overlay.open { display: flex; }
+
+  .lightbox-content {
+    max-width: 92vw;
+    max-height: 85vh;
+    display: flex;
+  }
+
+  .lightbox-content img,
+  .lightbox-content video {
+    max-width: 92vw;
+    max-height: 85vh;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6);
+    object-fit: contain;
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,175,55,0.5);
+    background: rgba(0,0,0,0.5);
+    color: #fffdf5;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  .live-gallery-empty {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: rgba(255,226,151,0.55);
+    padding: 20px 24px 0;
+    white-space: normal;
   }
 
   /* ─── FLOATING MUSIC BUTTON ─── */
@@ -1144,7 +1749,7 @@
     <h2 style="font-size: clamp(36px,10vw,60px);">SAVE</h2>
   </div>
 
-  <!-- ✦ CLASSIC REFINED COUPLE ILLUSTRATION ✦ -->
+  <!--  CLASSIC REFINED COUPLE ILLUSTRATION  -->
   <div class="couple-illustration reveal" style="display: flex; align-items: center; justify-content: center;">
   <div style="border: 1px solid var(--gold); padding: 30px 40px; border-radius: 200px; text-align: center;">
     <div style="font-family: 'Playfair Display', serif; font-size: 14px; letter-spacing: 4px; color: var(--muted);">Two hearts</div>
@@ -1291,12 +1896,89 @@
   <p class="rsvp-response" id="rsvp-response" aria-live="polite"></p>
 </section>
 
+<!-- ═══ RSVP CELEBRATION MODAL ═══ -->
+<div class="rsvp-modal-overlay" id="rsvp-modal-overlay" aria-hidden="true">
+  <div class="rsvp-modal" role="dialog" aria-modal="true" aria-labelledby="rsvp-modal-title">
+    <button type="button" class="rsvp-modal-close" id="rsvp-modal-close" aria-label="Close">✕</button>
+    <div class="rsvp-modal-icon">💍✨</div>
+    <h3 id="rsvp-modal-title">We can't wait to celebrate with you! 💍✨</h3>
+    <p>See you on 19 · 09 · 2026</p>
+  </div>
+</div>
+
+<!-- ═══ WISHING WALL ═══ -->
+<section class="wishwall-section" id="wishwall">
+  <p class="section-label reveal">From The Heart</p>
+  <h2 class="reveal">Well Wishes</h2>
+  <p class="wishwall-sub reveal">Leave a little love for Mohamed &amp; Habiba — it appears right here for everyone.</p>
+
+  <form class="wish-form reveal" id="wish-form">
+    <input type="text" id="wish-name" class="wish-input" placeholder="Your name" maxlength="30" required>
+    <textarea id="wish-message" class="wish-input wish-textarea" placeholder="Write your wish..." maxlength="200" required></textarea>
+    <button type="submit" class="wish-submit ripple-surface">Send Wish</button>
+    <p class="wish-status" id="wish-status" aria-live="polite"></p>
+  </form>
+
+  <div class="wish-wall" id="wish-wall">
+    <p class="wish-empty" id="wish-empty">Be the first to leave a wish 💛</p>
+  </div>
+</section>
+
+<!-- ═══ GUEST MEMORIES ═══ -->
+<section class="memories-section" id="memories">
+  <p class="section-label reveal">Capture The Day</p>
+  <h2 class="reveal">Guest Memories</h2>
+  <p class="memories-sub reveal">Got a photo or video from the day? Add it to our shared album.</p>
+
+  <div class="memories-dropzone reveal" id="memories-dropzone" tabindex="0" role="button" aria-label="Upload photos or videos">
+    <div class="memories-dropzone-icon">📷</div>
+    <p class="memories-dropzone-text">Drag &amp; drop photos or videos here</p>
+    <p class="memories-dropzone-or">or</p>
+    <span class="memories-browse-btn">Browse Files</span>
+    <input type="file" id="memories-input" accept="image/*,video/*" multiple hidden>
+  </div>
+
+  <div class="memories-preview-grid reveal" id="memories-preview-grid"></div>
+
+  <button type="button" class="memories-submit ripple-surface" id="memories-submit" disabled>Share Your Moments 📸</button>
+  <p class="memories-status" id="memories-status" aria-live="polite"></p>
+  <p class="memories-closed" id="memories-closed" style="display:none;">Uploads are now closed — thank you for sharing your moments with us 💛</p>
+</section>
+
+<!-- ═══ LIVE GALLERY (guest uploads shown here, updates in real time) ═══ -->
+<section class="live-gallery-section" id="live-gallery">
+  <p class="section-label reveal">Captured By You</p>
+  <h2 class="reveal">Through Your Eyes</h2>
+  <p class="live-gallery-sub reveal">Every photo shared above appears here — swipe to see them all.</p>
+  <div class="live-badge reveal"><span class="live-dot"></span> Live</div>
+  <div class="live-gallery-strip" id="live-gallery-strip">
+    <p class="live-gallery-empty" id="live-gallery-empty">No photos yet — be the first to share one 📸</p>
+  </div>
+</section>
+
+<!-- ═══ LIGHTBOX (enlarged view when tapping a guest photo/video) ═══ -->
+<div class="lightbox-overlay" id="lightbox-overlay">
+  <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
+  <div class="lightbox-content" id="lightbox-content"></div>
+</div>
+
+<!-- ═══ SHARE THE JOY ═══ -->
+<section class="share-section" id="share-joy">
+  <p class="section-label reveal">Spread The Word</p>
+  <h2 class="reveal">Share The Joy</h2>
+  <p class="share-sub reveal">Download your own story card and post it today.</p>
+  <div class="share-preview reveal">
+    <canvas id="share-canvas" width="1080" height="1920"></canvas>
+  </div>
+  <button type="button" class="share-btn ripple-surface reveal" id="share-download">Download Story</button>
+</section>
+
 <!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="footer-names">Mohamed <span class="amp">&amp;</span> Habiba</div>
   <p class="footer-date">19 &nbsp;·&nbsp; 09 &nbsp;·&nbsp; 2026</p>
   <div class="divider"></div>
-  <p class="footer-credit" style="margin-top:28px;">Created By HAMZA</p>
+  <p class="footer-credit" style="margin-top:28px;">Developed By HAMZA</p>
   <div class="social-icons">
   <!-- انستجرام -->
   <a href="https://www.instagram.com/q_7vmza" target="_blank">
@@ -1661,6 +2343,58 @@
         }
       }
 
+      function fireConfetti() {
+        try {
+          if (typeof confetti !== 'function') return;
+          const colors = ['#d4af37', '#ffe9a6', '#f3df9b', '#fffaf0', '#a67c20'];
+          // Big center burst
+          confetti({ particleCount: 120, spread: 100, origin: { y: 0.55 }, colors: colors, scalar: 1.1 });
+          // Side cannons for a couple seconds, full-screen feel
+          const end = Date.now() + 1800;
+          (function frame() {
+            confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors: colors });
+            confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors: colors });
+            if (Date.now() < end) requestAnimationFrame(frame);
+          })();
+        } catch (err) {
+          // Confetti is decorative only; never block RSVP.
+        }
+      }
+
+      function openRsvpModal() {
+        try {
+          const overlay = document.getElementById('rsvp-modal-overlay');
+          if (!overlay) return;
+          overlay.classList.add('show');
+          overlay.setAttribute('aria-hidden', 'false');
+        } catch (err) { /* modal is optional */ }
+      }
+
+      function closeRsvpModal() {
+        try {
+          const overlay = document.getElementById('rsvp-modal-overlay');
+          if (!overlay) return;
+          overlay.classList.remove('show');
+          overlay.setAttribute('aria-hidden', 'true');
+        } catch (err) { /* modal is optional */ }
+      }
+
+      (function initRsvpModalClose() {
+        try {
+          const overlay = document.getElementById('rsvp-modal-overlay');
+          const closeBtn = document.getElementById('rsvp-modal-close');
+          if (closeBtn) closeBtn.addEventListener('click', closeRsvpModal);
+          if (overlay) {
+            overlay.addEventListener('click', (e) => {
+              if (e.target === overlay) closeRsvpModal();
+            });
+          }
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeRsvpModal();
+          });
+        } catch (err) { /* modal close wiring is optional */ }
+      })();
+
       buttons.forEach(btn => {
         btn.addEventListener('click', () => {
           try {
@@ -1670,6 +2404,8 @@
             if (choice === 'yes') {
               response.textContent = "Wonderful — we can't wait to celebrate with you! 🥂";
               burstPetals(btn);
+              fireConfetti();
+              openRsvpModal();
               try { localStorage.setItem('mh_rsvp', 'yes'); } catch (e) { /* ignore storage errors */ }
             } else {
               response.textContent = "We'll miss you, but thank you for letting us know. 💛";
@@ -1744,6 +2480,495 @@
       update();
     } catch (err) {
       // Parallax is a visual extra; page must remain fully usable without it.
+    }
+  })();
+</script>
+
+<!-- ═══ LIGHTBOX (tap-to-enlarge logic, shared by the live gallery) ═══ -->
+<script>
+  (function initLightbox() {
+    const overlay = document.getElementById('lightbox-overlay');
+    const content = document.getElementById('lightbox-content');
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!overlay || !content || !closeBtn) return;
+
+    window.openLightbox = function (url, type) {
+      content.innerHTML = '';
+      if (type === 'video') {
+        const v = document.createElement('video');
+        v.src = url;
+        v.controls = true;
+        v.autoplay = true;
+        v.playsInline = true;
+        content.appendChild(v);
+      } else {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Shared by a guest';
+        content.appendChild(img);
+      }
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeLightbox = function () {
+      overlay.classList.remove('open');
+      content.innerHTML = '';
+      document.body.style.overflow = '';
+    };
+
+    closeBtn.addEventListener('click', window.closeLightbox);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) window.closeLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') window.closeLightbox();
+    });
+  })();
+</script>
+
+<!-- ═══ FIREBASE (for the live Wishing Wall + Gallery) ═══ -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<!-- عدّل بياناتك مرة واحدة بس في firebase-config.js، وهي بتتشارك مع owner.html تلقائيًا -->
+<script src="firebase-config.js"></script>
+<script>
+  // ─── WISHING WALL (live, shared across all guests) ───
+  (function initWishwall() {
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+      const wishesRef = db.ref('wishes').limitToLast(50);
+
+      const form = document.getElementById('wish-form');
+      const nameInput = document.getElementById('wish-name');
+      const msgInput = document.getElementById('wish-message');
+      const statusEl = document.getElementById('wish-status');
+      const wallEl = document.getElementById('wish-wall');
+      const emptyEl = document.getElementById('wish-empty');
+      const submitBtn = form ? form.querySelector('.wish-submit') : null;
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // Keeps one DOM card per wish id, so an admin pin/delete from owner.html
+      // updates this page live without a refresh.
+      const wishCards = {};
+
+      function reorderWall() {
+        if (!wallEl) return;
+        const cards = Object.values(wishCards);
+        cards.sort(function (a, b) {
+          const pa = a.dataset.pinned === '1', pb = b.dataset.pinned === '1';
+          if (pa !== pb) return pa ? -1 : 1;
+          return (Number(b.dataset.ts) || 0) - (Number(a.dataset.ts) || 0);
+        });
+        cards.forEach(function (c) { wallEl.appendChild(c); });
+        if (emptyEl) emptyEl.style.display = cards.length ? 'none' : '';
+      }
+
+      function upsertWish(id, data) {
+        if (!data || !data.name || !data.message) return;
+        let card = wishCards[id];
+        if (!card) {
+          card = document.createElement('div');
+          card.className = 'wish-card';
+          wishCards[id] = card;
+        }
+        card.dataset.pinned = data.pinned ? '1' : '0';
+        card.dataset.ts = data.timestamp || 0;
+        card.innerHTML =
+          (data.pinned ? '<div class="wish-pinned">📌 Pinned</div>' : '') +
+          '<div class="wish-name">' + escapeHtml(data.name) + '</div>' +
+          '<div class="wish-text">' + escapeHtml(data.message) + '</div>';
+        reorderWall();
+      }
+
+      wishesRef.on('child_added', function (snap) { upsertWish(snap.key, snap.val()); });
+      wishesRef.on('child_changed', function (snap) { upsertWish(snap.key, snap.val()); });
+      wishesRef.on('child_removed', function (snap) {
+        delete wishCards[snap.key];
+        reorderWall();
+      });
+
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const name = nameInput.value.trim();
+          const message = msgInput.value.trim();
+          if (!name || !message) return;
+          if (submitBtn) submitBtn.disabled = true;
+          if (statusEl) statusEl.textContent = 'Sending...';
+          db.ref('wishes').push({
+            name: name.slice(0, 30),
+            message: message.slice(0, 200),
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          }).then(function () {
+            if (statusEl) statusEl.textContent = 'Thank you! 💛';
+            form.reset();
+          }).catch(function () {
+            if (statusEl) statusEl.textContent = "Couldn't send — try again.";
+          }).finally(function () {
+            if (submitBtn) submitBtn.disabled = false;
+          });
+        });
+      }
+    } catch (err) {
+      // If Firebase isn't configured yet, hide the section instead of showing a broken form.
+      const section = document.getElementById('wishwall');
+      if (section) section.style.display = 'none';
+    }
+  })();
+</script>
+
+<!-- ═══ GUEST MEMORIES (client-side preview + Firebase Storage upload) ═══ -->
+<script>
+  (function initMemories() {
+    try {
+      const dropzone = document.getElementById('memories-dropzone');
+      const input = document.getElementById('memories-input');
+      const grid = document.getElementById('memories-preview-grid');
+      const submitBtn = document.getElementById('memories-submit');
+      const statusEl = document.getElementById('memories-status');
+      const closedEl = document.getElementById('memories-closed');
+      if (!dropzone || !input || !grid || !submitBtn) return;
+
+      // Uploads close automatically 2 hours before the wedding (9:00 PM → cutoff 7:00 PM, Cairo time).
+      const uploadDeadline = new Date('2026-09-19T19:00:00+02:00');
+      if (Date.now() >= uploadDeadline.getTime()) {
+        dropzone.style.display = 'none';
+        grid.style.display = 'none';
+        submitBtn.style.display = 'none';
+        if (closedEl) closedEl.style.display = 'block';
+        return;
+      }
+
+      let selectedFiles = [];
+      const objectUrls = [];
+
+      function renderPreviews() {
+        // Release old preview URLs before re-rendering.
+        objectUrls.forEach((u) => URL.revokeObjectURL(u));
+        objectUrls.length = 0;
+        grid.innerHTML = '';
+
+        selectedFiles.forEach((file, index) => {
+          const item = document.createElement('div');
+          item.className = 'memories-preview-item';
+          const url = URL.createObjectURL(file);
+          objectUrls.push(url);
+
+          if (file.type.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.src = url;
+            video.muted = true;
+            video.playsInline = true;
+            item.appendChild(video);
+          } else {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Preview';
+            item.appendChild(img);
+          }
+
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.className = 'memories-preview-remove';
+          removeBtn.setAttribute('aria-label', 'Remove');
+          removeBtn.textContent = '✕';
+          removeBtn.addEventListener('click', () => {
+            selectedFiles.splice(index, 1);
+            renderPreviews();
+          });
+          item.appendChild(removeBtn);
+          grid.appendChild(item);
+        });
+
+        submitBtn.disabled = selectedFiles.length === 0;
+      }
+
+      function addFiles(fileList) {
+        Array.from(fileList).forEach((file) => {
+          if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+            selectedFiles.push(file);
+          }
+        });
+        renderPreviews();
+      }
+
+      dropzone.addEventListener('click', () => input.click());
+      dropzone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+      });
+      input.addEventListener('change', () => { addFiles(input.files); input.value = ''; });
+
+      ['dragenter', 'dragover'].forEach((evt) => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach((evt) => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+        });
+      });
+      dropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+      });
+
+      submitBtn.addEventListener('click', async () => {
+        if (!selectedFiles.length) return;
+        submitBtn.disabled = true;
+        statusEl.textContent = 'Uploading...';
+        try {
+          // Reuses the same firebaseConfig set up above for the Wishing Wall.
+          if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+          let uploaded = 0;
+
+          for (const file of selectedFiles) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+
+            const res = await fetch(
+              'https://api.cloudinary.com/v1_1/' + cloudinaryConfig.cloudName + '/auto/upload',
+              { method: 'POST', body: formData }
+            );
+            if (!res.ok) throw new Error('Cloudinary upload failed');
+            const data = await res.json();
+
+            await firebase.database().ref('gallery-uploads').push({
+              url: data.secure_url,
+              publicId: data.public_id,
+              resourceType: data.resource_type,
+              type: file.type.startsWith('video/') ? 'video' : 'image',
+              timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+            uploaded++;
+            statusEl.textContent = 'Uploading ' + uploaded + ' / ' + selectedFiles.length + '...';
+          }
+
+          statusEl.textContent = 'Thank you! Your memories are shared 💛';
+          selectedFiles = [];
+          renderPreviews();
+        } catch (err) {
+          statusEl.textContent = "Couldn't upload — please try again.";
+          submitBtn.disabled = false;
+        }
+      });
+    } catch (err) {
+      // If anything goes wrong, hide the section instead of showing a broken uploader.
+      const section = document.getElementById('memories');
+      if (section) section.style.display = 'none';
+    }
+  })();
+</script>
+
+<!-- ═══ LIVE GALLERY (listens for new guest uploads and displays them) ═══ -->
+<script>
+  (function initLiveGallery() {
+    try {
+      const strip = document.getElementById('live-gallery-strip');
+      const emptyEl = document.getElementById('live-gallery-empty');
+      if (!strip) return;
+
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+      const uploadsRef = db.ref('gallery-uploads').limitToLast(60);
+
+      // Keeps one DOM tile per upload id, so a pin/delete from owner.html
+      // updates this strip live without a refresh.
+      const galleryItems = {};
+
+      function reorderStrip() {
+        const items = Object.values(galleryItems);
+        items.sort(function (a, b) {
+          const pa = a.dataset.pinned === '1', pb = b.dataset.pinned === '1';
+          if (pa !== pb) return pa ? -1 : 1;
+          return (Number(a.dataset.ts) || 0) - (Number(b.dataset.ts) || 0);
+        });
+        items.forEach(function (el) { strip.appendChild(el); });
+        if (emptyEl) emptyEl.style.display = items.length ? 'none' : '';
+      }
+
+      function upsertItem(id, data) {
+        if (!data || !data.url) return;
+        let item = galleryItems[id];
+        if (!item) {
+          item = document.createElement('div');
+          item.className = 'live-gallery-item';
+          galleryItems[id] = item;
+        }
+        item.dataset.pinned = data.pinned ? '1' : '0';
+        item.dataset.ts = data.timestamp || 0;
+        item.innerHTML = '';
+
+        if (data.type === 'video') {
+          const video = document.createElement('video');
+          video.src = data.url;
+          video.muted = true;
+          video.loop = true;
+          video.playsInline = true;
+          video.controls = true;
+          item.appendChild(video);
+
+          const expandBtn = document.createElement('button');
+          expandBtn.type = 'button';
+          expandBtn.className = 'live-gallery-expand-btn';
+          expandBtn.setAttribute('aria-label', 'Enlarge video');
+          expandBtn.textContent = '⤢';
+          expandBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            openLightbox(data.url, 'video');
+          });
+          item.appendChild(expandBtn);
+        } else {
+          const img = document.createElement('img');
+          img.src = data.url;
+          img.alt = 'Shared by a guest';
+          img.loading = 'lazy';
+          img.addEventListener('click', function () { openLightbox(data.url, 'image'); });
+          item.appendChild(img);
+        }
+
+        reorderStrip();
+      }
+
+      uploadsRef.on('child_added', function (snap) { upsertItem(snap.key, snap.val()); });
+      uploadsRef.on('child_changed', function (snap) { upsertItem(snap.key, snap.val()); });
+      uploadsRef.on('child_removed', function (snap) {
+        delete galleryItems[snap.key];
+        reorderStrip();
+      });
+    } catch (err) {
+      // If Firebase isn't configured yet, hide the section instead of showing an empty box.
+      const section = document.getElementById('live-gallery');
+      if (section) section.style.display = 'none';
+    }
+  })();
+</script>
+
+<!-- ═══ SHARE THE JOY (story-card generator, canvas-based, no backend needed) ═══ -->
+<script>
+  (function initShareCard() {
+    try {
+      const canvas = document.getElementById('share-canvas');
+      const downloadBtn = document.getElementById('share-download');
+      if (!canvas || !downloadBtn) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+
+      function drawCard() {
+        // Background matching the site's dark gold gradient
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#3b2a13');
+        bg.addColorStop(0.5, '#171006');
+        bg.addColorStop(1, '#090704');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Soft radial glow near the top
+        const glow = ctx.createRadialGradient(W / 2, H * 0.32, 40, W / 2, H * 0.32, W * 0.8);
+        glow.addColorStop(0, 'rgba(212,175,55,0.28)');
+        glow.addColorStop(1, 'rgba(212,175,55,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, W, H);
+
+        // Thin gold inset border
+        ctx.strokeStyle = 'rgba(212,175,55,0.5)';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(48, 48, W - 96, H - 96);
+
+        ctx.textAlign = 'center';
+
+        // Monogram line
+        ctx.fillStyle = 'rgba(212,175,55,0.85)';
+        ctx.font = '300 34px Montserrat, sans-serif';
+        ctx.save();
+        ctx.letterSpacing = '10px';
+        ctx.fillText('M  &  H   ·   2 0 2 6', W / 2, H * 0.34);
+        ctx.restore();
+
+        // Names
+        ctx.fillStyle = '#fffdf5';
+        ctx.font = '800 108px "Playfair Display", serif';
+        ctx.fillText('Mohamed', W / 2, H * 0.44);
+        ctx.fillStyle = '#d4af37';
+        ctx.font = 'italic 400 90px "Playfair Display", serif';
+        ctx.fillText('&', W / 2, H * 0.505);
+        ctx.fillStyle = '#fffdf5';
+        ctx.font = '800 108px "Playfair Display", serif';
+        ctx.fillText('Habiba', W / 2, H * 0.58);
+
+        // Divider line with dot
+        ctx.strokeStyle = 'rgba(212,175,55,0.5)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(W / 2 - 140, H * 0.64);
+        ctx.lineTo(W / 2 - 20, H * 0.64);
+        ctx.moveTo(W / 2 + 20, H * 0.64);
+        ctx.lineTo(W / 2 + 140, H * 0.64);
+        ctx.stroke();
+        ctx.fillStyle = '#d4af37';
+        ctx.beginPath();
+        ctx.arc(W / 2, H * 0.64, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Date
+        ctx.fillStyle = 'rgba(255,226,151,0.85)';
+        ctx.font = '300 40px Montserrat, sans-serif';
+        ctx.save();
+        ctx.letterSpacing = '6px';
+        ctx.fillText('19 · 09 · 2026', W / 2, H * 0.685);
+        ctx.restore();
+
+        // Script line
+        ctx.fillStyle = 'rgba(255,226,151,0.75)';
+        ctx.font = '400 52px Caveat, cursive';
+        ctx.fillText("Join us in celebrating our forever", W / 2, H * 0.8);
+
+        // Bottom credit
+        ctx.fillStyle = 'rgba(212,175,55,0.6)';
+        ctx.font = '300 26px Montserrat, sans-serif';
+        ctx.save();
+        ctx.letterSpacing = '3px';
+        ctx.fillText('#MOHAMEDHABIBA2026', W / 2, H * 0.93);
+        ctx.restore();
+      }
+
+      // Wait for the site's Google Fonts to finish loading before drawing,
+      // otherwise the canvas can render with a fallback font.
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(drawCard).catch(drawCard);
+      } else {
+        drawCard();
+      }
+      // Fallback redraw in case fonts load slowly.
+      window.addEventListener('load', drawCard);
+
+      downloadBtn.addEventListener('click', function () {
+        canvas.toBlob(function (blob) {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'mohamed-habiba-wedding-story.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        }, 'image/png');
+      });
+    } catch (err) {
+      // Story card is a nice-to-have; never let it break the rest of the page.
+      const section = document.getElementById('share-joy');
+      if (section) section.style.display = 'none';
     }
   })();
 </script>
