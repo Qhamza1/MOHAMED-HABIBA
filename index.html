@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  // Applied immediately (before CSS paints) to avoid a flash of the wrong theme.
+  (function () {
+    try {
+      const saved = localStorage.getItem('site-theme');
+      if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch (e) {}
+  })();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#120d08">
 <title>Mohamed & Habiba · 19.09.2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Caveat:wght@400;500;600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Caveat:wght@400;500;600&family=Montserrat:wght@200;300;400;500;600&family=El+Messiri:wght@400;500;600;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
 <!-- canvas-confetti, used for the RSVP celebration burst -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
@@ -35,13 +44,79 @@
     --champagne: #f3df9b;
     --gold-light: #ffe9a6;
     --gold-deep: #7d5b18;
+
+    --panel-light: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    --panel-light-2: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    --glass-40: rgba(255,255,255,0.4);
+    --glass-50: rgba(255,255,255,0.5);
+    --glass-55: rgba(255,255,255,0.55);
+    --glass-60: rgba(255,255,255,0.6);
+  }
+
+  /* ═══ NIGHT MODE (black + gold) ═══ */
+  [data-theme="dark"] {
+    --cream: #150f08;
+    --warm-white: #1a130a;
+    --ink: #f4e7c8;
+    --muted: #d3ab5c;
+    --gold: #e8c468;
+    --dark: #050302;
+    --antique-gold: #e0b458;
+    --soft-charcoal: #0c0904;
+    --champagne: #ffe9a6;
+    --gold-light: #ffe9a6;
+    --gold-deep: #ffd97a;
+
+    --panel-light: linear-gradient(135deg, #1c130a 0%, #120c05 55%, #060402 100%);
+    --panel-light-2: linear-gradient(135deg, #1c130a 0%, #120c05 55%, #060402 100%);
+    --glass-40: rgba(255,233,166,0.06);
+    --glass-50: rgba(255,233,166,0.08);
+    --glass-55: rgba(255,233,166,0.09);
+    --glass-60: rgba(255,233,166,0.11);
+  }
+
+  body, .wish-input, .wish-textarea, .field,
+  .memories-dropzone, .memories-browse-btn, .wish-card,
+  .memories-status, .memories-closed {
+    transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+  }
+
+  [data-theme="dark"] input::placeholder,
+  [data-theme="dark"] textarea::placeholder {
+    color: rgba(211,171,92,0.55);
+  }
+
+  /* ─── Theme toggle button ─── */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 500;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,175,55,0.5);
+    background: rgba(20,15,8,0.55);
+    color: #ffe9a6;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 6px 16px -6px rgba(0,0,0,0.4);
+  }
+
+  [data-theme="dark"] .theme-toggle {
+    background: rgba(255,233,166,0.12);
+    border-color: rgba(232,196,104,0.6);
   }
 
   html { scroll-behavior: smooth; }
 
   body {
     font-family: 'Cormorant Garamond', serif;
-    background: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    background: var(--panel-light);
     color: var(--ink);
     overflow-x: hidden;
   }
@@ -49,7 +124,7 @@
   /* ─── HERO ─── */
   .hero {
     min-height: 100vh;
-    background: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    background: var(--panel-light);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -222,7 +297,7 @@
 
   /* ─── SAVE THE DATE ─── */
   .save-date {
-    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    background: var(--panel-light-2);
     text-align: center;
     padding: 80px 24px;
   }
@@ -352,7 +427,7 @@
 
   /* ─── COUNTDOWN ─── */
   .countdown-section {
-    background: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    background: var(--panel-light);
     text-align: center;
     padding: 80px 24px;
   }
@@ -373,7 +448,7 @@
   }
 
   .count-box {
-    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    background: var(--panel-light-2);
     border-radius: 20px;
     padding: 28px 16px;
     box-shadow: 0 8px 28px rgba(104,73,12,0.12), inset 0 0 0 1px rgba(212,175,55,0.16);
@@ -408,7 +483,7 @@
 
   /* ─── PROGRAM ─── */
   .program {
-    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    background: var(--panel-light-2);
     padding: 80px 24px;
   }
 
@@ -527,7 +602,7 @@
 
   /* ─── INVITE SECTION ─── */
   .invite-section {
-    background: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    background: var(--panel-light);
     text-align: center;
     padding: 100px 24px;
   }
@@ -792,7 +867,7 @@
 
   /* ─── WISHING WALL ─── */
   .wishwall-section {
-    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    background: var(--panel-light-2);
     text-align: center;
     padding: 90px 24px 70px;
   }
@@ -827,8 +902,8 @@
     padding: 14px 18px;
     border-radius: 16px;
     border: 1px solid rgba(166,124,32,0.3);
-    background: rgba(255,255,255,0.6);
-    font-family: 'Cormorant Garamond', serif;
+    background: var(--glass-60);
+    font-family: 'Cormorant Garamond', 'El Messiri', serif;
     font-size: 16px;
     color: var(--ink);
     outline: none;
@@ -837,7 +912,7 @@
 
   .wish-input::placeholder { color: rgba(155,122,67,0.6); }
   .wish-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
-  .wish-textarea { min-height: 90px; resize: vertical; font-family: 'Cormorant Garamond', serif; }
+  .wish-textarea { min-height: 90px; resize: vertical; font-family: 'Cormorant Garamond', 'El Messiri', serif; }
 
   .wish-submit {
     margin-top: 4px;
@@ -881,7 +956,7 @@
   }
 
   .wish-card {
-    background: rgba(255,255,255,0.55);
+    background: var(--glass-55);
     border: 1px solid rgba(212,175,55,0.3);
     border-radius: 18px;
     padding: 18px 22px;
@@ -897,7 +972,7 @@
   }
 
   .wish-card .wish-name {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat', 'El Messiri', sans-serif;
     font-size: 11px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -906,7 +981,7 @@
   }
 
   .wish-card .wish-text {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Cormorant Garamond', 'El Messiri', serif;
     font-size: 18px;
     color: var(--ink);
     line-height: 1.5;
@@ -1002,7 +1077,7 @@
     position: relative;
     max-width: 360px;
     width: 100%;
-    background: linear-gradient(135deg, #fffdf7 0%, #fff8e8 55%, #f4e7c4 100%);
+    background: var(--panel-light-2);
     border: 1px solid rgba(212,175,55,0.4);
     border-radius: 24px;
     padding: 44px 30px 36px;
@@ -1047,7 +1122,7 @@
     height: 32px;
     border-radius: 50%;
     border: 1px solid rgba(166,124,32,0.3);
-    background: rgba(255,255,255,0.6);
+    background: var(--glass-60);
     color: var(--muted);
     font-size: 14px;
     cursor: pointer;
@@ -1066,7 +1141,7 @@
 
   /* ─── GUEST MEMORIES / PHOTO UPLOAD ─── */
   .memories-section {
-    background: linear-gradient(135deg, #fffaf0 0%, #f7f0df 48%, #efe0b8 100%);
+    background: var(--panel-light);
     text-align: center;
     padding: 90px 24px 80px;
   }
@@ -1093,7 +1168,7 @@
     margin: 0 auto 24px;
     border: 2px dashed rgba(166,124,32,0.4);
     border-radius: 20px;
-    background: rgba(255,255,255,0.4);
+    background: var(--glass-40);
     padding: 40px 24px;
     cursor: pointer;
     transition: border-color 0.25s, background 0.25s, transform 0.2s;
@@ -1102,7 +1177,7 @@
   .memories-dropzone:hover,
   .memories-dropzone:focus-visible {
     border-color: var(--gold);
-    background: rgba(255,255,255,0.6);
+    background: var(--glass-60);
     outline: none;
   }
 
@@ -1140,7 +1215,7 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--antique-gold);
-    background: rgba(255,255,255,0.5);
+    background: var(--glass-50);
     transition: background 0.2s;
   }
 
@@ -1224,7 +1299,7 @@
     padding: 18px 20px;
     border: 1px solid rgba(212,175,55,0.35);
     border-radius: 16px;
-    background: rgba(255,255,255,0.4);
+    background: var(--glass-40);
   }
 
   /* ─── LIVE GALLERY (guest uploads shown on the site) ─── */
@@ -1706,6 +1781,7 @@
 </style>
 </head>
 <body class="preloading">
+<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle night mode">🌙</button>
 
 <div id="preloader" class="preloader" aria-hidden="true">
   <div class="preloader-emblem">
@@ -2970,6 +3046,31 @@
       const section = document.getElementById('share-joy');
       if (section) section.style.display = 'none';
     }
+  })();
+</script>
+<script>
+  (function initThemeToggle() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+
+    function updateIcon() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      btn.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    btn.addEventListener('click', function () {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('site-theme', 'light'); } catch (e) {}
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        try { localStorage.setItem('site-theme', 'dark'); } catch (e) {}
+      }
+      updateIcon();
+    });
+
+    updateIcon();
   })();
 </script>
 </body>
